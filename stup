@@ -1,25 +1,39 @@
-import requests
+# send_webhook_urllib.py
 import base64
+import json
+import urllib.request
+import urllib.error
+import sys
 
-# Base64 encoded webhook
-WEBHOOK_ENCODED = b"aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyNDgwOTc4Nzk1ODM2NjQ3OS9GNEFLcnVQMzdzQkV4VHg2bDhwVFp3WEIyd09wOWVZYWdWeVdVa1N5VGJY
-NEMwNUxELXF1aVRpY01wUkdpUHhFU0hPZA=="
+WEBHOOK_B64 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyNDgwOTc4Nzk1ODM2NjQ3OS9GNEFLcnVQMzdzQkV4VHg2bDhwVFp3WEIyd09wOWVZYWdWeVdVa1N5VGJYNEN3NUxELXF1aVRpY01wUkdpUHhFU0hPZA=="
 
-def send_webhook():
-    # Decode the Base64 webhook URL
-    webhook_url = base64.b64decode(WEBHOOK_ENCODED).decode("utf-8")
+DEBUG = False
 
-    data = {
-        "content": "somebody opened the file"
-    }
+def decode_webhook(b64: str) -> str:
     try:
-        response = requests.post(webhook_url, json=data)
-        if response.status_code == 204:
-            print("Message sent successfully.")
-        else:
-            print(f"Failed to send message. Status code: {response.status_code}")
+        return base64.b64decode(b64).decode("utf-8")
     except Exception as e:
-        print(f"Error: {e}")
+        print("Failed to decode webhook (invalid base64):", e)
+        sys.exit(1)
+
+def send_message(content: str = "somebody opened the file") -> bool:
+    url = decode_webhook(WEBHOOK_B64)
+    if DEBUG:
+        print("Decoded webhook:", url)
+    data = json.dumps({"content": content}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            # On success Discord often returns 204 No Content
+            print("Sent. HTTP status:", getattr(resp, "status", "unknown"))
+            return True
+    except urllib.error.HTTPError as e:
+        # e.code, e.read() useful for debugging
+        print("HTTP error:", e.code, e.read())
+        return False
+    except Exception as e:
+        print("Error sending webhook:", e)
+        return False
 
 if __name__ == "__main__":
-    send_webhook()
+    send_message()
