@@ -1,39 +1,20 @@
-# send_webhook_urllib.py
-import base64
-import json
-import urllib.request
-import urllib.error
-import sys
+import requests
 
-WEBHOOK_B64 = "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQyNDgwOTc4Nzk1ODM2NjQ3OS9GNEFLcnVQMzdzQkV4VHg2bDhwVFp3WEIyd09wOWVZYWdWeVdVa1N5VGJYNEN3NUxELXF1aVRpY01wUkdpUHhFU0hPZA=="
+# Replace this with your Discord webhook URL
+WEBHOOK_URL = "https://discord.com/api/webhooks/1424809787958366479/F4AKruP37sBExTx6l8pTZwXB2wOp9eYagVyWUkSyTbX4Cw5LD-quiTicMpRGiPxESHOd"
 
-DEBUG = False
-
-def decode_webhook(b64: str) -> str:
+def send_webhook():
+    data = {
+        "content": "somebody opened the file"
+    }
     try:
-        return base64.b64decode(b64).decode("utf-8")
+        response = requests.post(WEBHOOK_URL, json=data)
+        if response.status_code == 204:
+            print("Message sent successfully.")
+        else:
+            print(f"Failed to send message. Status code: {response.status_code}")
     except Exception as e:
-        print("Failed to decode webhook (invalid base64):", e)
-        sys.exit(1)
-
-def send_message(content: str = "somebody opened the file") -> bool:
-    url = decode_webhook(WEBHOOK_B64)
-    if DEBUG:
-        print("Decoded webhook:", url)
-    data = json.dumps({"content": content}).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            # On success Discord often returns 204 No Content
-            print("Sent. HTTP status:", getattr(resp, "status", "unknown"))
-            return True
-    except urllib.error.HTTPError as e:
-        # e.code, e.read() useful for debugging
-        print("HTTP error:", e.code, e.read())
-        return False
-    except Exception as e:
-        print("Error sending webhook:", e)
-        return False
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
-    send_message()
+    send_webhook()
